@@ -802,7 +802,7 @@ class AllInOneMinify extends WireData implements Module, ConfigurableModule {
         // ------------------------------------------------------------------------
         if (strpos($_file,'/') === 0) $_path = rtrim(wire('config')->paths->root,'/').$_file;
         else if (strpos($_file,'http') === 0 && self::_checkRemoteFileAccess($_file)) {
-            // we use max_cache_lifetime as a placeholder because filemtime() idoesn't work with http requests
+            // we use max_cache_lifetime as a placeholder because filemtime() doesn't work with http requests
             $return['last_modified'] = time() - self::$cacheMaxLifetime;
             $_path = $_file;
         }
