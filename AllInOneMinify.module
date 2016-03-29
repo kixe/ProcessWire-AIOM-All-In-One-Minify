@@ -25,6 +25,9 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @version This is an modified version made by kixe 29.03.16
+ * github-fork: https://github.com/kixe/ProcessWire-AIOM-All-In-One-Minify
  * ----------------------------------------------------------------------------------
  */
 
@@ -794,21 +797,24 @@ class AllInOneMinify extends WireData implements Module, ConfigurableModule {
         $return = array();
 
         // ------------------------------------------------------------------------
+        // Check existence and whether there is internal/ external source.
         // Filter Directory Traversal (default: yes)
         // ------------------------------------------------------------------------
         if (strpos($_file,'/') === 0) $_path = rtrim(wire('config')->paths->root,'/').$_file;
-        else if (strpos($_file,'http') === 0) {
+        else if (strpos($_file,'http') === 0 && self::_checkRemoteFileAccess($_file)) {
+            // we use max_cache_lifetime as a placeholder because filemtime() idoesn't work with http requests
             $return['last_modified'] = time() - self::$cacheMaxLifetime;
-            $_path = $file;
+            $_path = $_file;
         }
         else {
             $_path  = (self::$directoryTraversal !== true) ? str_ireplace(array('../', './', '%2e%2e%2f', '..%2F'), '', wire('config')->paths->templates.$_file) : wire('config')->paths->templates.$_file;
+            if (!file_exists($_path)) return null;
         }
         
         // ------------------------------------------------------------------------
-        // Check existence and whether there is no external source.
+        // Check extension
         // ------------------------------------------------------------------------
-        if(file_exists($_path) AND self::_stristr_array_needle($_path, $extension)) {
+        if(self::_stristr_array_needle($_path, $extension)) {
             
             // Clear PHP stat() cache
             // ------------------------------------------------------------------------
@@ -820,6 +826,22 @@ class AllInOneMinify extends WireData implements Module, ConfigurableModule {
             $return['file_extension'] = pathinfo($_path, PATHINFO_EXTENSION);
             if (!isset($return['last_modified'])) $return['last_modified'] = filemtime($_path);
             return $return;
+        }
+    }
+
+    /**
+     * ------------------------------------------------------------------------
+     * Check if external datasource is available
+     * ------------------------------------------------------------------------
+     * @return bool
+     */
+    private static function _checkRemoteFileAccess($url) {
+        $file_headers = @get_headers($url);
+        if (preg_match('/200/',$file_headers[0])) return true;
+        else {
+            $error = "Connection to external datasource failed: '$url'";
+            if ($file_headers) $error .= " ($file_headers[0])";
+            throw new WireException($error);
         }
     }
 
