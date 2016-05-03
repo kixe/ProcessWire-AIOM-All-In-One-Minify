@@ -33,10 +33,7 @@
  *
  * @changelog
  * 03.05.16 option added to disable html minification triggered by page property.
- * ~~~~~
- * <?php namespace ProcessWire;
- * $page->skip_minify = true;
- * ~~~~~
+ * @example $page->skip_minify = true;
  * @since 3.2.3.1
  * @see HTML()
  *
