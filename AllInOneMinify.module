@@ -2,6 +2,7 @@
 
 /**
  * @author  FlipZoom Media Inc. - David Karich & Conclurer GbR
+ * @author  kixe - Christoph Thelen qualyweb.com
  * @contact David Karich <david.karich@flipzoom.de>, Conclurer GbR <aiom@conclurer.com>
  * @website www.flipzoom.de, www.conclurer.com
  * @create  2013-11-26
@@ -26,8 +27,19 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- * @version This is an modified version made by kixe 29.03.16
+ * This is an modified version made by kixe 29.03.16
+ * @version 3.2.3.1 - 03.05.16
  * github-fork: https://github.com/kixe/ProcessWire-AIOM-All-In-One-Minify
+ *
+ * @changelog
+ * 03.05.16 option added to disable html minification triggered by page property.
+ * ~~~~~
+ * <?php namespace ProcessWire;
+ * $page->skip_minify = true;
+ * ~~~~~
+ * @since 3.2.3.1
+ * @see HTML()
+ *
  * ----------------------------------------------------------------------------------
  */
 
@@ -69,11 +81,11 @@ class AllInOneMinify extends WireData implements Module, ConfigurableModule {
             'title' => __('AIOM+ (All In One Minify) for CSS, LESS, JS and HTML'), 
 
             // ------------------------------------------------------------------------
-            // Version: major, minor, revision, i.e. 100 = 1.1.0
+            // Version: major, minor, revision, i.e. 110 = 1.1.0
             // ------------------------------------------------------------------------
-            'version' => 323,
+            'version' => 3231,
 
-            'author' => 'David Karich & Conclurer GbR',
+            'author' => 'David Karich & Conclurer GbR, kixe',
 
             // ------------------------------------------------------------------------
             // Summary is brief description of what this module is
@@ -1035,7 +1047,7 @@ class AllInOneMinify extends WireData implements Module, ConfigurableModule {
         // ------------------------------------------------------------------------
         // Don't process the admin pages
         // ------------------------------------------------------------------------
-        if($event->object->template == 'admin' OR self::$enableHTMLMinify !== true OR self::$developmentMode === true) return;
+        if($event->object->skip_minify OR $event->object->template == 'admin' OR self::$enableHTMLMinify !== true OR self::$developmentMode === true) return;
 
         // ------------------------------------------------------------------------
         // Minify HTML source code
